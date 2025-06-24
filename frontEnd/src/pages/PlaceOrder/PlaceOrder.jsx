@@ -1,7 +1,8 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import './PlaceOrder.css'
 import {StoreContext} from '../../context/StoreContext'
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const PlaceOrder = () => {
   const{ getTotalCartAmount,token,food_list,cartItems,url } =useContext(StoreContext);
@@ -24,7 +25,7 @@ const PlaceOrder = () => {
     setData(data=>({...data,[name]:value}))
   }
 
-  const placeholder = async (event) => {
+  const placeOrder = async (event) => {
     event.preventDefault();
     let orderItems = [];
     food_list.map((item)=>{
@@ -49,9 +50,20 @@ const PlaceOrder = () => {
     }
   }
 
+  const navigate = useNavigate();
+  const cartTotal = getTotalCartAmount(); // Assuming it's stable on every render
+  
+  useEffect(() => {
+    if (!token) {
+      navigate('/cart');
+    } else if (cartTotal === 0) {
+      navigate('/cart');
+    }
+  }, [token, cartTotal]);
+
 
   return (
-    <form onSubmit={placeholder} className="place-order">
+    <form onSubmit={placeOrder} className="place-order">
       <div className="place-order-left">
         <p className="title">Delivery Information</p>
         <div className="multi-fields">
